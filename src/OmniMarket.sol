@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.7.3;
+pragma solidity ^0.8.3;
 
-import "./external/SafeMath.sol";
-import "./interfaces/AggregatorV3Interface.sol";
+import "./SafeMath.sol";
+import "./AggregatorV3Interface.sol";
 
 contract OmniMarket {
 
@@ -105,7 +105,7 @@ contract OmniMarket {
   constructor(address _oracle, uint _duration) {
     oracle = _oracle;
     priceFeed = AggregatorV3Interface(oracle);
-    owner = msg.sender;
+    owner = payable(msg.sender);
     marketDuration = _duration;
     marketCount = 0;
     uint _price = getLatestPrice(); //returns latest ETH/USD in the following format: 40345000000 (8 decimals)
@@ -221,9 +221,8 @@ contract OmniMarket {
     require(winningBet > 0, "=== You have no bets on the winning option :( ===");
 
     uint winnings = calculateWinnings(_marketId, msg.sender);
-
     m.users[msg.sender].claimedWinnings = true;
-    msg.sender.transfer(winnings);
+    payable(msg.sender).transfer(winnings);
 
     emit LogWinningsClaimed(_marketId, msg.sender, winnings);
   }
@@ -239,7 +238,7 @@ contract OmniMarket {
 
     m.users[msg.sender].claimedCreationReward = true;
 
-    msg.sender.transfer(m.users[msg.sender].creationReward);
+    payable(msg.sender).transfer(m.users[msg.sender].creationReward);
 
     emit LogCreationRewardClaimed(_marketId, msg.sender, m.users[msg.sender].creationReward);
   }
@@ -255,7 +254,7 @@ contract OmniMarket {
 
     m.users[msg.sender].claimedSettlementReward = true;
 
-    msg.sender.transfer(m.users[msg.sender].settlementReward);
+    payable(msg.sender).transfer(m.users[msg.sender].settlementReward);
 
     emit LogSettlementRewardClaimed(_marketId, msg.sender, m.users[msg.sender].settlementReward);
   }
